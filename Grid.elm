@@ -113,7 +113,7 @@ relativePosition (r1, c1) (r2, c2) =
         else 
             (N, S)
     else 
-        if c1 - c1 < 0 then 
+        if c1 - c2 < 0 then 
             (E, W)
         else 
             (W, E)
