@@ -21,6 +21,16 @@ walledMaze x y =
     Grid.repeat x y initialNode
 
 
+getNode : Coordinate -> Maze Node -> Maybe Node 
+getNode coord maze = 
+    Grid.get coord maze
+
+
+setNode : Coordinate -> Maze Node -> Maze Node 
+setNode coord newNode maze = 
+    Grid.set coord newNode maze
+
+
 addEdge_ : Node -> Grid.Direction -> Node
 addEdge_ node dir =
     case dir of
@@ -33,12 +43,12 @@ addEdge_ node dir =
 addEdge : Coordinate -> Grid.Direction -> Maze Node -> Maze Node
 addEdge coord dir maze =
     let
-        node = Grid.get coord maze
+        node = getNode coord maze
                 |> Maybe.map (\node_ -> addEdge_ node_ dir)
     in
         case node of
             Nothing      -> maze
-            Just newNode -> Grid.set coord newNode maze
+            Just newNode -> setNode coord newNode maze
 
 
 
@@ -53,7 +63,7 @@ createEdge coord1 coord2 maze =
         maze
 {-- ========= Node Functions ================= --}
 
-hasPath : Node -> Direction -> Bool
+hasPath : Node -> Grid.Direction -> Bool
 hasPath nd dir =
     case dir of
         N -> nd.n
@@ -69,16 +79,16 @@ hasPath nd dir =
 move : Coordinate -> Grid.Direction -> Coordinate
 move (x, y) dir =
     case dir of
-    N -> (x, y + 1)
-    S -> (x, y - 1)
-    E -> (x + 1, y)
-    W -> (x - 1, y)
+        N -> (x, y + 1)
+        S -> (x, y - 1)
+        E -> (x + 1, y)
+        W -> (x - 1, y)
 
 validMove : Coordinate -> Grid.Direction -> Maze a -> Bool
 validMove coord dir g =
     case (get coord g) of
         Nothing -> False
-        Just x -> hasPath x dir
+        Just x  -> hasPath x dir
 
 movePlayer : Coordinate -> Grid.Direction -> Maze a -> Coordinate
 movePlayer coord dir g =
