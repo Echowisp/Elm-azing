@@ -11,35 +11,82 @@ import Grid exposing (Coordinate, Direction)
 
 type Difficulty = Easy | Medium | Hard
 type Player = Human | AI | None
+type GameState = AIVictory | PlayerVictory | Started | Stopped
 
-type alias Model = {
-    maze : Maze
-    player : Coordinate
-    ai : Coordinate
-    difficulty : Difficulty
-    winner : Player
-}
+type alias Model =
+    {
+        playerMaze : Maze
+        aiMaze : Maze
+        player : Coordinate
+        ai : Coordinate
+        difficulty : Difficulty
+        winner : Player
+        gameState : GameState
+        winningCoord : Coordinate
+    }
 
 initModel =
     {
-        maze = ??? //TODO
+        playerMaze = walledMaze 0 0
+        aiMaze = walledMaze 0 0
         player = (0,0)
         ai = (0,0)
         difficulty = Easy
         winner = None
+        gameState = Stopped
+        winningCoord = (10, 10)
     }
 
 
 -- UPDATE
 
-type Msg = Noop | Reset | Increment
+type Msg = MoveN | MoveS | MoveE | MoveW | DiffEasy | DiffMed | DiffHard | Gen |
+           NoOp
+
+updatePlayerCoord : Model -> Direction -> Model
+updatePlayerCoord mdl dir =
+    -- Player should only move if came is started
+    if mdl.gameState == Started then
+        let
+            newCoord = (Maze.movePlayer mdl.player dir mdl.playerMaze)
+        in
+        {
+            mdl |
+            player = newCoord,
+            -- Check if player has won
+            gameState =
+                if newCoord == mdl.winningCoord then
+                    PlayerVictory
+                else
+                    Started
+        }
+    else
+        mdl
+
+updateDifficulty : Model -> Difficulty -> Model
+updateDifficulty mdl newDiff =
+    --Only allow difficulty updates if game is stopped
+    if mdl.gameState != Started then
+        { mdl | difficulty = newDiff }
+    else
+        mdl
+
+generateMazes : Model -> Model
+generateMazes mdl =
+    Debug.todo "???"
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  case msg of
-    Noop -> (model, Cmd.none)
-    Reset -> (initModel, Cmd.none)
-    Increment -> ({ count = 1 + model.count }, Cmd.none)
+    case msg of
+        MoveN -> (updatePlayerCoord model N, Cmd.none)
+        MoveS -> (updatePlayerCoord model S, Cmd.none)
+        MoveE -> (updatePlayerCoord model E, Cmd.none)
+        MoveW -> (updatePlayerCoord model W, Cmd.none)
+        DiffEasy -> (updateDifficulty model Easy, Cmd.none)
+        DiffMed -> (updateDifficulty model Medium, Cmd.none)
+        DiffHard -> (updateDifficulty model Hard, Cmd.none)
+        Gen -> (generateMazes model, Cmd.none)
+        NoOp -> (model, Cmd.none) --I don't know if this is useful
 
 
 -- VIEW
