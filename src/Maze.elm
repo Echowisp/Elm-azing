@@ -16,17 +16,17 @@ initialNode : Node
 initialNode =
     Node False False False False
 
-walledMaze : Int -> Int -> Maze Node
+walledMaze : Int -> Int -> Maze
 walledMaze x y =
     Grid.repeat x y initialNode
 
 
-getNode : Coordinate -> Maze Node -> Maybe Node 
+getNode : Coordinate -> Maze -> Maybe Node 
 getNode coord maze = 
     Grid.get coord maze
 
 
-setNode : Coordinate -> Maze Node -> Maze Node 
+setNode : Coordinate -> Node -> Maze -> Maze  
 setNode coord newNode maze = 
     Grid.set coord newNode maze
 
@@ -40,7 +40,7 @@ addEdge_ node dir =
         S -> {node | s = True}
 
 
-addEdge : Coordinate -> Grid.Direction -> Maze Node -> Maze Node
+addEdge : Coordinate -> Grid.Direction -> Maze -> Maze
 addEdge coord dir maze =
     let
         node = getNode coord maze
@@ -52,7 +52,7 @@ addEdge coord dir maze =
 
 
 
-createEdge : Coordinate -> Coordinate -> Maze Node -> Maze Node
+createEdge : Coordinate -> Coordinate -> Maze -> Maze
 createEdge coord1 coord2 maze =
     if Grid.verifyAdjacent coord1 coord2 then
         case relativePosition coord1 coord2 of
@@ -84,13 +84,13 @@ move (x, y) dir =
         E -> (x + 1, y)
         W -> (x - 1, y)
 
-validMove : Coordinate -> Grid.Direction -> Maze a -> Bool
+validMove : Coordinate -> Grid.Direction -> Maze -> Bool
 validMove coord dir g =
     case (get coord g) of
         Nothing -> False
         Just x  -> hasPath x dir
 
-movePlayer : Coordinate -> Grid.Direction -> Maze a -> Coordinate
+movePlayer : Coordinate -> Grid.Direction -> Maze -> Coordinate
 movePlayer coord dir g =
     if (validMove coord dir g) then
         move coord dir
