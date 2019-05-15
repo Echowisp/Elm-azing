@@ -68,8 +68,8 @@ hasPath nd dir =
     case dir of
         N -> nd.n
         E -> nd.e
-        S -> nd.s
         W -> nd.w
+        S -> nd.s
 
 {-- ========= End Node Functions ================= --}
 
@@ -80,9 +80,9 @@ move : Coordinate -> Grid.Direction -> Coordinate
 move (x, y) dir =
     case dir of
         N -> (x, y + 1)
-        S -> (x, y - 1)
         E -> (x + 1, y)
         W -> (x - 1, y)
+        S -> (x, y - 1)
 
 validMove : Coordinate -> Grid.Direction -> Maze -> Bool
 validMove coord dir g =
