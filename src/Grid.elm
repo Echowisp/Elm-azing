@@ -52,6 +52,14 @@ repeatSquare size occupant =
     square size (always << always occupant)
 
 
+dims : Grid a -> (Int, Int) 
+dims grid = 
+    ( Array.length grid
+     , row 0 grid 
+        |> Maybe.map Array.length
+        |> Maybe.withDefault 0
+    )
+
 toColumn : Coordinate -> Int
 toColumn coord =
     Tuple.second coord
