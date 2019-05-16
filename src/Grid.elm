@@ -52,10 +52,10 @@ repeatSquare size occupant =
     square size (always << always occupant)
 
 
-dims : Grid a -> (Int, Int) 
-dims grid = 
+dims : Grid a -> (Int, Int)
+dims grid =
     ( Array.length grid
-     , row 0 grid 
+     , row 0 grid
         |> Maybe.map Array.length
         |> Maybe.withDefault 0
     )
@@ -97,11 +97,11 @@ map f grid =
 
 indexedMap : (Int -> Int -> a -> b) -> Grid a -> Grid b
 indexedMap f grid=
-    Array.indexedMap (\r row -> Array.indexedMap (\c cell -> (f r c cell))) grid
+    Array.indexedMap (\r rw -> Array.indexedMap (\c cell -> (f r c cell)) rw) grid
 
 foldl : (a -> b -> b) -> b -> Grid a -> b
 foldl f acc g =
-    Array.foldl (\row y -> Array.foldl f y row) acc g
+    Array.foldl (\rw y -> Array.foldl f y rw) acc g
 
 verifyAdjacent : Coordinate -> Coordinate -> Bool
 verifyAdjacent (r1, c1) (r2, c2) =
