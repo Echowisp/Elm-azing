@@ -5,7 +5,7 @@ import Browser.Events
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Maze exposing (..)
-import Grid exposing (Coordinate, Direction)
+import Grid exposing (..)
 
 -- MODEL
 
@@ -15,25 +15,25 @@ type GameState = AIVictory | PlayerVictory | Started | Stopped
 
 type alias Model =
     {
-        playerMaze : Maze
-        aiMaze : Maze
-        player : Coordinate
-        ai : Coordinate
-        difficulty : Difficulty
-        winner : Player
-        gameState : GameState
+        playerMaze : Maze,
+        aiMaze : Maze,
+        player : Coordinate,
+        ai : Coordinate,
+        difficulty : Difficulty,
+        winner : Player,
+        gameState : GameState,
         winningCoord : Coordinate
     }
 
 initModel =
     {
-        playerMaze = walledMaze 0 0
-        aiMaze = walledMaze 0 0
-        player = (0,0)
-        ai = (0,0)
-        difficulty = Easy
-        winner = None
-        gameState = Stopped
+        playerMaze = walledMaze 0 0,
+        aiMaze = walledMaze 0 0,
+        player = (0,0),
+        ai = (0,0),
+        difficulty = Easy,
+        winner = None,
+        gameState = Stopped,
         winningCoord = (10, 10)
     }
 
@@ -66,7 +66,7 @@ updatePlayerCoord mdl dir =
 updateDifficulty : Model -> Difficulty -> Model
 updateDifficulty mdl newDiff =
     --Only allow difficulty updates if game is stopped
-    if mdl.gameState != Started then
+    if mdl.gameState /= Started then
         { mdl | difficulty = newDiff }
     else
         mdl
@@ -108,18 +108,17 @@ view model =
 
 -- SUBSCRIPTIONS
 
--- https://github.com/elm/browser/blob/1.0.0/notes/keyboard.md
-keyDecoder : Decode.Decoder String
-keyDecoder =
-  Decode.field "key" Decode.string
+-- keyDecoder : Decode.Decoder String
+-- keyDecoder =
+--   Decode.field "key" Decode.string
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-  Sub.batch
-    [ Browser.Events.onMouseDown (Decode.succeed Increment)
-    , Browser.Events.onKeyDown
-        (Decode.map (\key -> if key == "Escape" then Reset else Noop) keyDecoder)
-    ]
+-- subscriptions : Model -> Sub Msg
+-- subscriptions model =
+--   Sub.batch
+--     [ Browser.Events.onMouseDown (Decode.succeed Increment)
+--     , Browser.Events.onKeyDown
+--         (Decode.map (\key -> if key == "Escape" then Reset else Noop) keyDecoder)
+--     ]
 
 
 -- MAIN
