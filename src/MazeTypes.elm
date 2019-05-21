@@ -31,3 +31,13 @@ type alias Node =
     , w : Bool
     , s : Bool
     }
+
+
+
+oppositeDir : Direction -> Direction
+oppositeDir dir =
+    case dir of 
+        N -> S
+        E -> W
+        W -> E
+        S -> N

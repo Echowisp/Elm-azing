@@ -72,12 +72,12 @@ hasPath nd dir =
 {-- ========= Coordinate Functions ================= --}
 
 move : Coordinate -> MazeTypes.Direction -> Coordinate
-move (x, y) dir =
+move (r, c) dir =
     case dir of
-        N -> (x, y + 1)
-        E -> (x + 1, y)
-        W -> (x - 1, y)
-        S -> (x, y - 1)
+        N -> (r - 1, c)
+        E -> (r, c + 1)
+        W -> (r, c - 1)
+        S -> (r + 1, c)
 
 validMove : Coordinate -> MazeTypes.Direction -> Maze -> Bool
 validMove coord dir g =
@@ -91,6 +91,12 @@ movePlayer coord dir g =
         move coord dir
     else
         coord
+
+coordHasPath : Maze -> Coordinate -> Direction -> Bool 
+coordHasPath maze coord dir = 
+    case Grid.get coord maze of 
+        Nothing   -> False 
+        Just node -> hasPath node dir
 
 {-- ========= End Coordinate Functions ================= --}
 
