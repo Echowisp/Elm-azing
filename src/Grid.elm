@@ -8,12 +8,7 @@ module Grid exposing (..)
 
 import Array exposing (Array)
 import Maybe
-
-
-type alias Grid a = Array (Array a)
-type alias Coordinate = (Int, Int)
-
-type Direction = N | E | W | S
+import MazeTypes exposing (..)
 
 toCoordinate : Int -> Int -> Coordinate
 toCoordinate x y =

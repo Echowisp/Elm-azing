@@ -2,15 +2,7 @@ module Maze exposing (..)
 
 import Grid exposing (..)
 import Maybe
-
-type alias Node =
-    { n : Bool
-    , e : Bool
-    , w : Bool
-    , s : Bool
-    }
-
-type alias Maze = Grid.Grid Node
+import MazeTypes exposing (..)
 
 mazeSize = 60 -- Maze dimensions will be mazeSize x mazeSize
 
@@ -33,7 +25,7 @@ setNode coord newNode maze =
     Grid.set coord newNode maze
 
 
-addEdge_ : Node -> Grid.Direction -> Node
+addEdge_ : Node -> MazeTypes.Direction -> Node
 addEdge_ node dir =
     case dir of
         N -> {node | n = True}
@@ -42,7 +34,7 @@ addEdge_ node dir =
         S -> {node | s = True}
 
 
-addEdge : Coordinate -> Grid.Direction -> Maze -> Maze
+addEdge : Coordinate -> MazeTypes.Direction -> Maze -> Maze
 addEdge coord dir maze =
     let
         node = getNode coord maze
@@ -65,7 +57,7 @@ createEdge coord1 coord2 maze =
         maze
 {-- ========= Node Functions ================= --}
 
-hasPath : Node -> Grid.Direction -> Bool
+hasPath : Node -> MazeTypes.Direction -> Bool
 hasPath nd dir =
     case dir of
         N -> nd.n
@@ -78,7 +70,7 @@ hasPath nd dir =
 
 {-- ========= Coordinate Functions ================= --}
 
-move : Coordinate -> Grid.Direction -> Coordinate
+move : Coordinate -> MazeTypes.Direction -> Coordinate
 move (x, y) dir =
     case dir of
         N -> (x, y + 1)
@@ -86,13 +78,13 @@ move (x, y) dir =
         W -> (x - 1, y)
         S -> (x, y - 1)
 
-validMove : Coordinate -> Grid.Direction -> Maze -> Bool
+validMove : Coordinate -> MazeTypes.Direction -> Maze -> Bool
 validMove coord dir g =
     case (get coord g) of
         Nothing -> False
         Just x  -> hasPath x dir
 
-movePlayer : Coordinate -> Grid.Direction -> Maze -> Coordinate
+movePlayer : Coordinate -> MazeTypes.Direction -> Maze -> Coordinate
 movePlayer coord dir g =
     if (validMove coord dir g) then
         move coord dir

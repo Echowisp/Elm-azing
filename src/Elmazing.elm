@@ -6,29 +6,16 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Maze exposing (..)
 import Grid exposing (..)
+import Render exposing (..)
+import MazeTypes exposing (..)
+import RandomDFS exposing (..)
 
 -- MODEL
 
-type Difficulty = Easy | Medium | Hard
-type Player = Human | AI | None
-type GameState = AIVictory | PlayerVictory | Started | Stopped
-
-type alias Model =
-    {
-        playerMaze : Maze,
-        aiMaze : Maze,
-        player : Coordinate,
-        ai : Coordinate,
-        difficulty : Difficulty,
-        winner : Player,
-        gameState : GameState,
-        winningCoord : Coordinate
-    }
-
 initModel =
     {
-        playerMaze = walledMaze 0 0,
-        aiMaze = walledMaze 0 0,
+        playerMaze = Tuple.first (buildMaze 60 60),
+        aiMaze = walledMaze 60 60,
         player = (0,0),
         ai = (0,0),
         difficulty = Easy,
@@ -92,33 +79,14 @@ update msg model =
 -- VIEW
 
 view : Model -> Html Msg
-view model =
-    -- https://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/
-    let styles =
-          -- add more spaces if you get a "-- PARSE ERROR --"
-          [ ("position", "fixed")
-          , ("top", "50%")
-          , ("left", "50%")
-          , ("transform", "translate(-50%, -50%)")
-          ]
-    in
-    let display = Html.text ("Count: " ++ Debug.toString model.count) in
-    Html.div (List.map (\(k, v) -> Attr.style k v) styles) [display]
+view model = render model
 
 
 -- SUBSCRIPTIONS
 
--- keyDecoder : Decode.Decoder String
--- keyDecoder =
---   Decode.field "key" Decode.string
-
--- subscriptions : Model -> Sub Msg
--- subscriptions model =
---   Sub.batch
---     [ Browser.Events.onMouseDown (Decode.succeed Increment)
---     , Browser.Events.onKeyDown
---         (Decode.map (\key -> if key == "Escape" then Reset else Noop) keyDecoder)
---     ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
 
 
 -- MAIN
