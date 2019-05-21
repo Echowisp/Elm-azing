@@ -2,6 +2,7 @@ module Maze exposing (..)
 
 import Grid exposing (..)
 import Maybe
+import Random
 import MazeTypes exposing (..)
 
 mazeSize = 60 -- Maze dimensions will be mazeSize x mazeSize
@@ -92,3 +93,62 @@ movePlayer coord dir g =
         coord
 
 {-- ========= End Coordinate Functions ================= --}
+
+getNeighbors_ : Coordinate -> List Coordinate
+getNeighbors_ coord = 
+    [move coord N, move coord E, move coord W, move coord S]
+
+
+
+getNeighbors : Maze -> Coordinate -> List Coordinate
+getNeighbors maze coord = 
+    getNeighbors_ coord 
+    |> List.filter (validCoordinate maze)
+
+validCoordinate : Maze -> Coordinate  -> Bool 
+validCoordinate maze (r, c) = 
+    let 
+        (len, wid) = dims maze 
+    in
+        r < len && r >= 0 && c < wid && c >= 0
+
+
+kth : Int -> List Coordinate -> Coordinate
+kth k coords =
+    case (k, coords) of
+        (0, c::_) -> c
+        (_, _::r) -> kth (k - 1) r
+        (_, _)    -> Debug.todo "Improper call to kth"
+
+
+{-- ========= End Coordinate Functions ================= --}
+
+
+
+{-- ================ Random Functions ================== -}
+
+seed0 : Random.Seed
+seed0 =
+  Random.initialSeed 41
+
+
+-- TODO: Use Random.independentSeed in program
+--       It is a generator for random seed
+
+randomDirection : Random.Generator Direction
+randomDirection =
+    Random.uniform N [E, W, S]
+
+
+-- Assumes that the list of coordinates given are the neighbors
+-- of some node and that the list is nonempty
+randomNeighbor : List Coordinate -> Random.Generator Coordinate
+randomNeighbor neighbors = 
+    Random.int 0 ((+) -1 <| List.length neighbors)
+    |> Random.map (\k -> kth k neighbors)
+
+
+
+stepNeighbor : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed)
+stepNeighbor seed neighbors = 
+    Random.step (randomNeighbor neighbors) seed
