@@ -7,12 +7,12 @@ import MazeTypes exposing (..)
 import Maze exposing (..)
 
 
-initialiseMaze : Int -> Int -> (Maze, Maybe Coordinate)
+initialiseMaze : Int -> Int -> Maze
 initialiseMaze len wid =
     buildMaze len wid
 
 
-buildMaze : Int -> Int -> (Maze, Maybe Coordinate)
+buildMaze : Int -> Int -> Maze
 buildMaze len wid =
     let
         initialMaze = walledMaze len wid
@@ -28,18 +28,18 @@ unvisitedNeighbors maze visited coord =
     |> List.filter (\c -> not (Set.member c visited))
 
 
-randDFS : Random.Seed -> Maze -> Set Coordinate -> Stack Coordinate -> Maybe Coordinate -> (Maze, Maybe Coordinate)
+randDFS : Random.Seed -> Maze -> Set Coordinate -> Stack Coordinate -> Maybe Coordinate -> Maze
 randDFS seed maze visited toVisit cur =
     case cur of
         Nothing    ->
             case Stack.pop toVisit of
-                (Nothing, _)         -> (maze, Nothing) -- finished
+                (Nothing, _)         -> maze -- finished
                 (newCur, unvisited)  -> randDFS seed maze visited unvisited newCur
         Just coord ->
             case unvisitedNeighbors maze visited coord of
                 []              ->
                     case Stack.pop toVisit of
-                        (Nothing, _)         -> (maze, cur) -- finished
+                        (Nothing, _)         -> maze -- finished
                         (newCur, unvisited)  -> randDFS seed maze visited unvisited newCur
                 unseenNeighbors ->
                     let

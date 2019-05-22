@@ -5,7 +5,7 @@ import Maybe
 import Random
 import MazeTypes exposing (..)
 
-mazeSize = 60 -- Maze dimensions will be mazeSize x mazeSize
+mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
 
 initialNode : Node
 initialNode =
