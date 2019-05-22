@@ -14,8 +14,8 @@ import RandomDFS exposing (..)
 
 initModel =
     {
-        playerMaze = Tuple.first (buildMaze 60 60),
-        aiMaze = walledMaze 60 60,
+        playerMaze = Tuple.first <| RandomDFS.buildMaze 30 30,
+        aiMaze = walledMaze 30 30,
         player = (0,0),
         ai = (0,0),
         difficulty = Easy,
