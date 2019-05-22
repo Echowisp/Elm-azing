@@ -92,29 +92,29 @@ movePlayer coord dir g =
     else
         coord
 
-coordHasPath : Maze -> Coordinate -> Direction -> Bool 
-coordHasPath maze coord dir = 
-    case Grid.get coord maze of 
-        Nothing   -> False 
+coordHasPath : Maze -> Coordinate -> Direction -> Bool
+coordHasPath maze coord dir =
+    case Grid.get coord maze of
+        Nothing   -> False
         Just node -> hasPath node dir
 
 {-- ========= End Coordinate Functions ================= --}
 
 getNeighbors_ : Coordinate -> List Coordinate
-getNeighbors_ coord = 
+getNeighbors_ coord =
     [move coord N, move coord E, move coord W, move coord S]
 
 
 
 getNeighbors : Maze -> Coordinate -> List Coordinate
-getNeighbors maze coord = 
-    getNeighbors_ coord 
+getNeighbors maze coord =
+    getNeighbors_ coord
     |> List.filter (validCoordinate maze)
 
-validCoordinate : Maze -> Coordinate  -> Bool 
-validCoordinate maze (r, c) = 
-    let 
-        (len, wid) = dims maze 
+validCoordinate : Maze -> Coordinate  -> Bool
+validCoordinate maze (r, c) =
+    let
+        (len, wid) = dims maze
     in
         r < len && r >= 0 && c < wid && c >= 0
 
@@ -149,12 +149,12 @@ randomDirection =
 -- Assumes that the list of coordinates given are the neighbors
 -- of some node and that the list is nonempty
 randomNeighbor : List Coordinate -> Random.Generator Coordinate
-randomNeighbor neighbors = 
+randomNeighbor neighbors =
     Random.int 0 ((+) -1 <| List.length neighbors)
     |> Random.map (\k -> kth k neighbors)
 
 
 
 stepNeighbor : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed)
-stepNeighbor seed neighbors = 
+stepNeighbor seed neighbors =
     Random.step (randomNeighbor neighbors) seed

@@ -12,7 +12,8 @@ import Color exposing (..)
 import MazeTypes exposing (..)
 import Html exposing (Html)
 
-cellSize = 16 -- Each cell is a cellSize by cellsize square
+mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
+cellSize = 32 -- Each cell is a cellSize by cellsize square
 wallThickness = 2 -- Each wall is a 2px thick line
 
 render : Model -> Html msg
@@ -26,13 +27,26 @@ render model =
             else
                 []
         player = renderPlayer model.player
+        playerTitle = renderText "Player"
         ai = renderAI model.ai
-        playerMaze = stack [player, renderMaze model.playerMaze]
-        aiMaze = stack [ai, renderMaze model.aiMaze]
-        spacing = Collage.square 100 |> filled (uniform white)
+        aiTitle = renderText "AI"
+        playerMaze = vertical [playerTitle,
+                               stack [player, renderMaze model.playerMaze]]
+        aiMaze = vertical [aiTitle, stack [ai, renderMaze model.aiMaze]]
+        spacing = spacer 50 0
+        mazes = horizontal [playerMaze, spacing, aiMaze] |> svg
     in
-        horizontal [playerMaze, spacing, aiMaze] |> svg
+    mazes
 
+{-- Title Rendering Logic --}
+renderText : String -> Collage msg
+renderText s =
+    Text.fromString s
+    |> Text.size large
+    |> rendered
+    |> align top
+
+{-- Maze Rendering Logic --}
 
 renderMaze : Maze -> Collage msg
 renderMaze m =
@@ -43,7 +57,6 @@ renderMaze m =
 renderCell : Collage msg
 renderCell =
         Collage.square cellSize |> filled (uniform lightPurple)
-
 
 
 renderWalls : Node -> Collage msg
