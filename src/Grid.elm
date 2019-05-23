@@ -83,7 +83,7 @@ set coord newVal grid =
     |> Maybe.map (Array.set (toColumn coord) newVal)
     |> Maybe.map (\r -> Array.set (toRow coord) r grid)
     |> Maybe.withDefault grid
-    |> Debug.log "new"
+
 
 
 map : (a -> b) -> Grid a -> Grid b

@@ -2,20 +2,25 @@ module Elmazing exposing (main)
 
 import Browser
 import Browser.Events
-import Html exposing (Html)
+import Html exposing (..)
 import Html.Attributes as Attr
+import Html.Events exposing (onClick)
 import Maze exposing (..)
 import Grid exposing (..)
 import Render exposing (..)
 import MazeTypes exposing (..)
 import RandomDFS exposing (..)
-
+import Bootstrap.Button as Button exposing (..)
+import Bootstrap.Grid as BGrid exposing (..)
+import Bootstrap.Grid.Col as Col exposing (..)
+import Bootstrap.Grid.Row as Row exposing (..)
+import Bootstrap.Text as Text exposing (..)
 -- MODEL
 
 initModel =
     {
-        playerMaze = Tuple.first <| RandomDFS.buildMaze 30 30,
-        aiMaze = walledMaze 30 30,
+        playerMaze = walledMaze mazeSize mazeSize,
+        aiMaze = walledMaze mazeSize mazeSize,
         player = (0,0),
         ai = (0,0),
         difficulty = Easy,
@@ -52,7 +57,6 @@ updatePlayerCoord mdl dir =
 
 updateDifficulty : Model -> Difficulty -> Model
 updateDifficulty mdl newDiff =
-    --Only allow difficulty updates if game is stopped
     if mdl.gameState /= Started then
         { mdl | difficulty = newDiff }
     else
@@ -60,7 +64,10 @@ updateDifficulty mdl newDiff =
 
 generateMazes : Model -> Model
 generateMazes mdl =
-    Debug.todo "???"
+    case mdl.difficulty of
+        Easy -> {mdl | playerMaze = Tuple.first <| RandomDFS.buildMaze mazeSize mazeSize}
+        Medium -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
+        Hard -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -75,12 +82,37 @@ update msg model =
         Gen -> (generateMazes model, Cmd.none)
         NoOp -> (model, Cmd.none) --I don't know if this is useful
 
-
 -- VIEW
 
 view : Model -> Html Msg
-view model = render model
-
+view model =
+    BGrid.containerFluid []
+    [ BGrid.simpleRow
+        [ BGrid.col
+            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Button.button [ Button.primary, Button.onClick DiffEasy ] [ text "Easy" ] ]
+        , BGrid.col
+            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Button.button [ Button.primary, Button.onClick DiffMed ] [ text "Medium" ] ]
+        , BGrid.col
+            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Button.button [ Button.primary, Button.onClick DiffHard ] [ text "Hard" ] ]
+        ]
+    , BGrid.simpleRow
+        [ BGrid.col
+            [ Col.xs12, Col.textAlign Text.alignXsCenter ]
+            [ render model ]
+        ]
+    ]
+    -- div []
+    --     [
+    --         Button.button [ Button.success, ] [ text "Primary" ],
+    --         -- button [ onClick DiffEasy ] [ text "Easy" ],
+    --         -- button [ onClick DiffMed ] [ text "Medium" ],
+    --         -- button [ onClick DiffHard ] [ text "Hard" ],
+    --         -- button [ onClick Gen ] [ text "Start" ],
+    --         render model
+    --     ]
 
 -- SUBSCRIPTIONS
 

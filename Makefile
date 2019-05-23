@@ -1,6 +1,6 @@
 all:
-	elm make --output ./index.html src/Elmazing.elm
+	elm make --output ./main.js src/Elmazing.elm
 
 clean:
-	rm index.html
+	rm *.js
 
