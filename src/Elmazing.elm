@@ -65,7 +65,7 @@ updateDifficulty mdl newDiff =
 generateMazes : Model -> Model
 generateMazes mdl =
     case mdl.difficulty of
-        Easy -> {mdl | playerMaze = Tuple.first <| RandomDFS.buildMaze mazeSize mazeSize}
+        Easy -> {mdl | playerMaze = RandomDFS.buildMaze mazeSize mazeSize}
         Medium -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
         Hard -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
 
