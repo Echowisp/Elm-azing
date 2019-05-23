@@ -11,9 +11,18 @@ initialNode : Node
 initialNode =
     Node False False False False
 
+openNode : Node 
+openNode =
+    Node True True True True
+
 walledMaze : Int -> Int -> Maze
 walledMaze x y =
     Grid.repeat x y initialNode
+
+
+openMaze : Int -> Int -> Maze 
+openMaze x y = 
+    Grid.repeat x y openNode
 
 
 getNode : Coordinate -> Maze -> Maybe Node
@@ -158,3 +167,7 @@ randomNeighbor neighbors =
 stepNeighbor : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed)
 stepNeighbor seed neighbors =
     Random.step (randomNeighbor neighbors) seed
+
+
+randomElement : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed) 
+randomElement = stepNeighbor
