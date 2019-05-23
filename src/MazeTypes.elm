@@ -32,11 +32,11 @@ type alias Node =
     , s : Bool
     }
 
-
+mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
 
 oppositeDir : Direction -> Direction
 oppositeDir dir =
-    case dir of 
+    case dir of
         N -> S
         E -> W
         W -> E

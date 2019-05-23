@@ -12,7 +12,6 @@ import Color exposing (..)
 import MazeTypes exposing (..)
 import Html exposing (Html)
 
-mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
 cellSize = 32 -- Each cell is a cellSize by cellsize square
 wallThickness = 2 -- Each wall is a 2px thick line
 
@@ -34,7 +33,7 @@ render model =
                                stack [player, renderMaze model.playerMaze]]
         aiMaze = vertical [aiTitle, stack [ai, renderMaze model.aiMaze]]
         spacing = spacer 50 0
-        mazes = horizontal [playerMaze, spacing, aiMaze] |> svg
+        mazes = horizontal (winLoss ++ [playerMaze, spacing, aiMaze]) |> svg
     in
     mazes
 
@@ -62,13 +61,29 @@ renderCell =
 renderWalls : Node -> Collage msg
 renderWalls node =
     let
-        nPath = if node.n then [] else [(-cellSize/2, cellSize/2), (cellSize/2, cellSize/2)]
-        ePath = if node.e then [] else [(cellSize/2, cellSize/2), (cellSize/2, -cellSize/2)]
-        sPath = if node.s then [] else [(cellSize/2, -cellSize/2), (-cellSize/2, -cellSize/2)]
-        wPath = if node.w then [] else [(-cellSize/2, -cellSize/2), (-cellSize/2, cellSize/2)]
+        nPath = if node.n then
+                    []
+                else
+                    [segment (-cellSize/2, cellSize/2) (cellSize/2, cellSize/2)
+                    |> traced (solid thin (uniform blue))]
+        ePath = if node.e then
+                    []
+                else
+                    [segment (cellSize/2, cellSize/2) (cellSize/2, -cellSize/2)
+                    |> traced (solid thin (uniform blue))]
+        sPath = if node.s then
+                    []
+                else
+                    [segment (cellSize/2, -cellSize/2) (-cellSize/2, -cellSize/2)
+                    |> traced (solid thin (uniform blue))]
+        wPath = if node.w then
+                    []
+                else
+                    [segment (-cellSize/2, -cellSize/2) (-cellSize/2, cellSize/2)
+                    |> traced (solid thin (uniform blue))]
         walls = nPath ++ ePath ++ sPath ++ wPath
     in
-        path walls |> traced (solid thin (uniform blue))
+        stack walls
 
 renderNode : Int -> Int -> Node -> Collage msg
 renderNode r c nd =
@@ -87,7 +102,7 @@ renderPlayer (r, c) =
     let
         (x, y) = convertRCToXY r c
     in
-    (Collage.circle (cellSize/2))
+    (Collage.circle (cellSize/3))
     |> filled (uniform green)
     |> shift (cellSize/2, -cellSize/2) --Top left of Node is now on the origin
     |> shift (calculateShift r c)
@@ -97,7 +112,7 @@ renderAI (r, c) =
     let
         (x, y) = convertRCToXY r c
     in
-    (Collage.circle <| cellSize/2)
+    (Collage.circle <| cellSize/3)
     |> filled (uniform red)
     |> shift (cellSize/2, -cellSize/2) --Top left of Node is now on the origin
     |> shift (calculateShift r c)
