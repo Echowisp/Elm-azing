@@ -7,11 +7,6 @@ import MazeTypes exposing (..)
 import Maze exposing (..)
 
 
-initialiseMaze : Int -> Int -> Maze
-initialiseMaze len wid =
-    buildMaze len wid
-
-
 buildMaze : Int -> Int -> Maze
 buildMaze len wid =
     let
@@ -24,7 +19,7 @@ buildMaze len wid =
 
 unvisitedNeighbors : Maze -> Set Coordinate -> Coordinate -> List Coordinate
 unvisitedNeighbors maze visited coord =
-    Maze.getNeighbors maze coord
+    getNeighbors maze coord
     |> List.filter (\c -> not (Set.member c visited))
 
 

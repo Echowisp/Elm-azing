@@ -105,6 +105,17 @@ coordHasPath maze coord dir =
         Nothing   -> False
         Just node -> hasPath node dir
 
+
+selectMap : (Node -> Node) -> List Coordinate -> Maze -> Maze
+selectMap f select maze = 
+    case select of 
+        []          -> maze 
+        coord::rest -> 
+            let 
+                node =  Grid.get coord maze |> Maybe.withDefault openNode
+            in
+                selectMap f rest (Grid.set coord (f node) maze)
+
 {-- ========= End Coordinate Functions ================= --}
 
 getNeighbors_ : Coordinate -> List Coordinate
