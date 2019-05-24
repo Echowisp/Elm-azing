@@ -43,6 +43,7 @@ updatePlayerCoord mdl dir =
     if mdl.gameState == Started then
         let
             newCoord = (Maze.movePlayer mdl.player dir mdl.playerMaze)
+            a = Debug.log "???" 1
         in
         {
             mdl |
@@ -70,9 +71,10 @@ generateMazes mdl =
         mdl
     else
         {
-            mdl | playerMaze = RandomDFS.buildMaze mazeSize mazeSize,
-                  aiMaze = RandomDFS.buildMaze mazeSize mazeSize,
-                  gameState = Started
+            initModel | playerMaze = RandomDFS.buildMaze mazeSize mazeSize,
+                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize,
+                        gameState = Started,
+                        difficulty = mdl.difficulty
         }
 
 update : Msg -> Model -> (Model, Cmd Msg)

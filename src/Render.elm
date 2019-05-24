@@ -19,9 +19,9 @@ render : Model -> Html msg
 render model =
     let
         winLoss =
-            if model.gameState == AIVictory then
+            if model.gameState == PlayerVictory then
                 [renderVictory]
-            else if model.gameState == PlayerVictory then
+            else if model.gameState == AIVictory then
                 [renderDefeat]
             else
                 []
@@ -30,10 +30,15 @@ render model =
         ai = renderAI model.ai
         aiTitle = renderText "AI"
         playerMaze = vertical [playerTitle,
-                               stack [player, renderMaze model.playerMaze]]
-        aiMaze = vertical [aiTitle, stack [ai, renderMaze model.aiMaze]]
+                               stack [player,
+                                      renderMaze model.playerMaze,
+                                      renderMazeBg]]
+        aiMaze = vertical [aiTitle,
+                           stack [ai,
+                                  renderMaze model.aiMaze,
+                                  renderMazeBg]]
         spacing = spacer 50 0
-        mazes = horizontal (winLoss ++ [playerMaze, spacing, aiMaze]) |> svg
+        mazes = svg<| stack <| winLoss ++ [(horizontal ([playerMaze, spacing, aiMaze]))]
     in
     mazes
 
@@ -53,9 +58,9 @@ renderMaze m =
     |> Grid.foldl (\a b -> a :: b) []
     |> stack
 
-renderCell : Collage msg
-renderCell =
-        Collage.square cellSize |> filled (uniform lightPurple)
+renderMazeBg : Collage msg
+renderMazeBg =
+        Collage.square (cellSize * mazeSize) |> filled (uniform lightPurple)
 
 
 renderWalls : Node -> Collage msg
@@ -67,32 +72,29 @@ renderWalls node =
                     [segment (-cellSize/2, cellSize/2) (cellSize/2, cellSize/2)
                     |> traced (solid thin (uniform blue))]
         ePath = if node.e then
-                    []
+                    nPath
                 else
-                    [segment (cellSize/2, cellSize/2) (cellSize/2, -cellSize/2)
-                    |> traced (solid thin (uniform blue))]
+                    (segment (cellSize/2, cellSize/2) (cellSize/2, -cellSize/2)
+                    |> traced (solid thin (uniform blue))) :: nPath
         sPath = if node.s then
-                    []
+                    ePath
                 else
-                    [segment (cellSize/2, -cellSize/2) (-cellSize/2, -cellSize/2)
-                    |> traced (solid thin (uniform blue))]
+                    (segment (cellSize/2, -cellSize/2) (-cellSize/2, -cellSize/2)
+                    |> traced (solid thin (uniform blue))) :: ePath
         wPath = if node.w then
-                    []
+                    sPath
                 else
-                    [segment (-cellSize/2, -cellSize/2) (-cellSize/2, cellSize/2)
-                    |> traced (solid thin (uniform blue))]
-        walls = nPath ++ ePath ++ sPath ++ wPath
+                    (segment (-cellSize/2, -cellSize/2) (-cellSize/2, cellSize/2)
+                    |> traced (solid thin (uniform blue))) :: sPath
     in
-        stack walls
+        stack wPath
 
 renderNode : Int -> Int -> Node -> Collage msg
 renderNode r c nd =
     let
         walls = renderWalls nd
-        cell = renderCell
     in
-        [walls, cell]
-        |> stack
+        walls
         |> shift (cellSize/2, -cellSize/2) --Top left of Node is now on the origin
         |> shift (calculateShift r c)
 
