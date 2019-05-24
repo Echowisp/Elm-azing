@@ -2,6 +2,7 @@ module Elmazing exposing (main)
 
 import Browser
 import Browser.Events
+import Json.Decode as Decode
 import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onClick)
@@ -15,6 +16,7 @@ import Bootstrap.Grid as BGrid exposing (..)
 import Bootstrap.Grid.Col as Col exposing (..)
 import Bootstrap.Grid.Row as Row exposing (..)
 import Bootstrap.Text as Text exposing (..)
+
 -- MODEL
 
 initModel =
@@ -26,14 +28,14 @@ initModel =
         difficulty = Easy,
         winner = None,
         gameState = Stopped,
-        winningCoord = (10, 10)
+        winningCoord = (29, 29)
     }
 
 
 -- UPDATE
 
 type Msg = MoveN | MoveS | MoveE | MoveW | DiffEasy | DiffMed | DiffHard | Gen |
-           NoOp
+           NoOp | AIMove
 
 updatePlayerCoord : Model -> Direction -> Model
 updatePlayerCoord mdl dir =
@@ -41,6 +43,7 @@ updatePlayerCoord mdl dir =
     if mdl.gameState == Started then
         let
             newCoord = (Maze.movePlayer mdl.player dir mdl.playerMaze)
+            a = Debug.log "???" 1
         in
         {
             mdl |
@@ -64,10 +67,15 @@ updateDifficulty mdl newDiff =
 
 generateMazes : Model -> Model
 generateMazes mdl =
-    case mdl.difficulty of
-        Easy -> {mdl | playerMaze = RandomDFS.buildMaze mazeSize mazeSize}
-        Medium -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
-        Hard -> {mdl | playerMaze = walledMaze mazeSize mazeSize}
+    if mdl.gameState == Started then
+        mdl
+    else
+        {
+            initModel | playerMaze = RandomDFS.buildMaze mazeSize mazeSize,
+                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize,
+                        gameState = Started,
+                        difficulty = mdl.difficulty
+        }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -80,6 +88,7 @@ update msg model =
         DiffMed -> (updateDifficulty model Medium, Cmd.none)
         DiffHard -> (updateDifficulty model Hard, Cmd.none)
         Gen -> (generateMazes model, Cmd.none)
+        AIMove -> Debug.todo "???"
         NoOp -> (model, Cmd.none) --I don't know if this is useful
 
 -- VIEW
@@ -89,14 +98,17 @@ view model =
     BGrid.containerFluid []
     [ BGrid.simpleRow
         [ BGrid.col
-            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Col.xs3, Col.textAlign Text.alignXsCenter ]
             [ Button.button [ Button.primary, Button.onClick DiffEasy ] [ text "Easy" ] ]
         , BGrid.col
-            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Col.xs3, Col.textAlign Text.alignXsCenter ]
             [ Button.button [ Button.primary, Button.onClick DiffMed ] [ text "Medium" ] ]
         , BGrid.col
-            [ Col.xs4, Col.textAlign Text.alignXsCenter ]
+            [ Col.xs3, Col.textAlign Text.alignXsCenter ]
             [ Button.button [ Button.primary, Button.onClick DiffHard ] [ text "Hard" ] ]
+        , BGrid.col
+            [ Col.xs3, Col.textAlign Text.alignXsCenter ]
+            [ Button.button [ Button.success, Button.onClick Gen] [ text "Go!"] ]
         ]
     , BGrid.simpleRow
         [ BGrid.col
@@ -104,22 +116,34 @@ view model =
             [ render model ]
         ]
     ]
-    -- div []
-    --     [
-    --         Button.button [ Button.success, ] [ text "Primary" ],
-    --         -- button [ onClick DiffEasy ] [ text "Easy" ],
-    --         -- button [ onClick DiffMed ] [ text "Medium" ],
-    --         -- button [ onClick DiffHard ] [ text "Hard" ],
-    --         -- button [ onClick Gen ] [ text "Start" ],
-    --         render model
-    --     ]
 
 -- SUBSCRIPTIONS
 
+-- https://github.com/elm/browser/blob/1.0.0/notes/keyboard.md
+keyDecoder : Decode.Decoder String
+keyDecoder =
+  Decode.field "key" Decode.string
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
-
+  Sub.batch <|
+    [ Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "w" then MoveN else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "s" then MoveS else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "d" then MoveE else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "a" then MoveW else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "ArrowUp" then MoveN else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "ArrowDown" then MoveS else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "ArrowRight" then MoveE else NoOp) keyDecoder)
+    , Browser.Events.onKeyDown
+        (Decode.map (\key -> if key == "ArrowLeft" then MoveW else NoOp) keyDecoder)
+    ]
 
 -- MAIN
 
