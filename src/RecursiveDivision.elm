@@ -15,7 +15,7 @@ buildMaze len wid =
         visited = Set.empty |> Set.insert (0, 0) 
         frontier = [(0,0)]
     in
-        recursiveDivision Maze.seed0 intitialMaze
+        recursiveDivision Maze.seed0 intitialMaze |> borderMaze
 
 
 
@@ -30,8 +30,8 @@ randInt seed l u =
     Random.step (Random.int l u) seed 
 
 
-addHorizontalWall : Maze -> Int -> Int -> Int -> Maze 
-addHorizontalWall maze row start end = 
+addHorizontalWall : Int -> Int -> Int -> Maze -> Maze 
+addHorizontalWall row start end maze = 
     let 
         columns = List.range start end 
         coords1 = columns |> List.map (\x -> (row, x))
@@ -41,8 +41,8 @@ addHorizontalWall maze row start end =
         |> Maze.selectMap (\node -> {node | n = False}) coords2
 
 
-addVerticalWall : Maze -> Int -> Int -> Int -> Maze 
-addVerticalWall maze col start end = 
+addVerticalWall : Int -> Int -> Int -> Maze -> Maze 
+addVerticalWall col start end maze = 
     let 
         rows = List.range start end 
         coords1 = rows |> List.map (\x -> (x, col))
@@ -50,6 +50,18 @@ addVerticalWall maze col start end =
     in
         Maze.selectMap (\node -> {node | e = False}) coords1 maze
         |> Maze.selectMap (\node -> {node | w = False}) coords2 
+
+
+borderMaze : Maze -> Maze
+borderMaze maze = 
+    let 
+        (w, h) = Grid.dims maze 
+    in
+        addVerticalWall -1 0 h maze
+        |> addVerticalWall (w - 1) 0 h 
+        |> addHorizontalWall -1 0 w 
+        |> addHorizontalWall (h - 1) 0 w
+
 
 
 openHorizontalDoor : Coordinate -> Maze -> Maze 
@@ -71,8 +83,8 @@ divide seed (r, c) w h maze =
     else if w < h then 
         let 
             (wallRow, seed1) = randInt seed r (r + h)
-            (doorCol, seed2) = randInt seed1 c (c + w)
-            newMaze = addHorizontalWall maze wallRow c (c + w)
+            (doorCol, seed2) = randInt seed1 c (c + w - 1)
+            newMaze = addHorizontalWall wallRow c (c + w) maze
                         |> openHorizontalDoor (wallRow, doorCol)
         in 
           divide (Random.initialSeed wallRow) (wallRow, c) w (r + h - wallRow - 1) 
@@ -80,8 +92,8 @@ divide seed (r, c) w h maze =
     else 
         let 
             (wallCol, seed1) = randInt seed c (c + w)
-            (doorRow, seed2) = randInt seed1 r (r + h)
-            newMaze = addVerticalWall maze wallCol r (r + h)
+            (doorRow, seed2) = randInt seed1 r (r + h - 1)
+            newMaze = addVerticalWall wallCol r (r + h) maze
                         |> openVerticalDoor (wallCol, doorRow)
         in
             divide (Random.initialSeed wallCol) (r, wallCol) (c + w - wallCol - 1) h
