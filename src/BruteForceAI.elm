@@ -23,6 +23,8 @@ bruteForceAI mdl =
                     aiState = { state | dir = ndir, seed = nseed }
             }
         else
-            bruteForceAI { mdl | aiState = { dir = currDir, seed = nseed } }
+            bruteForceAI { mdl |
+                           aiState = { state | dir = currDir, seed = nseed }
+                         }
     else
         { mdl | ai = (movePlayer coord currDir aiMz) }
