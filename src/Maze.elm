@@ -105,7 +105,6 @@ coordHasPath maze coord dir =
         Nothing   -> False
         Just node -> hasPath node dir
 
-
 selectMap : (Node -> Node) -> List Coordinate -> Maze -> Maze
 selectMap f select maze =
     case select of
@@ -116,13 +115,39 @@ selectMap f select maze =
             in
                 selectMap f rest (Grid.set coord (f node) maze)
 
+isJunction : Maze -> Coordinate -> Direction -> Bool
+isJunction maze coord dir =
+    let
+        node = getNode coord maze
+    in
+        case node of
+            Just x ->
+                let
+                    cnt = x.n :: x.s :: x.e :: x.w :: [] |>
+                          List.foldl (\a b -> if a == True then 1 + b else b) 0
+                in
+                    if cnt >= 3 || not (hasPath x dir) then True else False
+            Nothing -> Debug.todo "Error in isJunction" -- Shouldn't Get Here
+
+isDeadEnd : Maze -> Coordinate -> Direction -> Bool
+isDeadEnd maze coord dir =
+    let
+        node = getNode coord maze
+    in
+        case node of
+            Just x ->
+                let
+                    cnt = x.n :: x.s :: x.e :: x.w :: [] |>
+                          List.foldl (\a b -> if a == True then 1 + b else b) 0
+                in
+                    if cnt == 1 then True else False
+            Nothing -> Debug.todo "Error in isJunction" -- Shouldn't Get Here
+
 {-- ========= End Coordinate Functions ================= --}
 
 getNeighbors_ : Coordinate -> List Coordinate
 getNeighbors_ coord =
     [move coord N, move coord E, move coord W, move coord S]
-
-
 
 getNeighbors : Maze -> Coordinate -> List Coordinate
 getNeighbors maze coord =
@@ -162,14 +187,9 @@ seed0 : Random.Seed
 seed0 =
   Random.initialSeed 41
 
-
--- TODO: Use Random.independentSeed in program
---       It is a generator for random seed
-
 randomDirection : Random.Generator Direction
 randomDirection =
     Random.uniform N [E, W, S]
-
 
 -- Assumes that the list of coordinates given are the neighbors
 -- of some node and that the list is nonempty
