@@ -162,6 +162,13 @@ validCoordinate maze (r, c) =
         r < len && r >= 0 && c < wid && c >= 0
 
 
+getValidMoves : Coordinate -> Maze -> List Coordinate
+getValidMoves coord maze = 
+    (List.map (\dir -> move coord dir) << 
+    List.filter (\dir -> coordHasPath maze coord dir))
+        cardinals
+
+
 kth : Int -> List Coordinate -> Coordinate
 kth k coords =
     case (k, coords) of

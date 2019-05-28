@@ -81,7 +81,7 @@ generateMazes mdl =
     else
         {
             initModel | playerMaze = RecursiveDivision.buildMaze mazeSize mazeSize sd,
-                        aiMaze = RecursiveDivision.buildMaze mazeSize mazeSize aiSd,
+                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize aiSd,
                         gameState = Started,
                         difficulty = mdl.difficulty
         }

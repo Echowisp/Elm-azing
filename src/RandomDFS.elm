@@ -7,14 +7,14 @@ import MazeTypes exposing (..)
 import Maze exposing (..)
 
 
-buildMaze : Int -> Int -> Maze
-buildMaze len wid =
+buildMaze : Int -> Int -> Random.Seed -> Maze
+buildMaze len wid seed =
     let
         initialMaze = walledMaze len wid
         visited = Set.empty |> Set.insert (0, 0)
         stack = Stack.initialise |> Stack.push (0, 0)
     in
-        randDFS Maze.seed0 initialMaze visited stack Nothing
+        randDFS seed initialMaze visited stack Nothing
 
 
 unvisitedNeighbors : Maze -> Set Coordinate -> Coordinate -> List Coordinate
