@@ -7,9 +7,22 @@ bruteForceAI : Model -> Model
 bruteForceAI mdl =
     let
         state = mdl.aiState
+        aiMz = mdl.aiMaze
+        coord = mdl.ai
+        currDir = state.dir
+        ide = isDeadEnd aiMz coord currDir
         (ndir, nseed) = stepDirection state.seed
     in
-    if validMove mdl.ai ndir mdl.aiMaze then
-        { mdl | ai = (movePlayer mdl.ai ndir mdl.aiMaze) }
+   if (isJunction aiMz coord currDir) then
+        if
+            validMove coord ndir aiMz &&
+            not ((not ide) && (currDir == oppositeDir ndir))
+        then
+            {
+                mdl | ai = (movePlayer coord ndir aiMz),
+                    aiState = { state | dir = ndir, seed = nseed }
+            }
+        else
+            bruteForceAI { mdl | aiState = { dir = currDir, seed = nseed } }
     else
-        bruteForceAI { mdl | aiState = { dir = ndir, seed = nseed } }
+        { mdl | ai = (movePlayer coord currDir aiMz) }

@@ -12,7 +12,7 @@ import Render exposing (..)
 import MazeTypes exposing (..)
 import RandomDFS exposing (..)
 import RecursiveDivision exposing (..)
-import MazeAI exposing (..)
+import BruteForceAI exposing (..)
 import Time exposing (..)
 import Random exposing (..)
 import Bootstrap.Button as Button exposing (..)
@@ -174,7 +174,7 @@ subscriptions model =
         (Decode.map (\key -> if key == "ArrowRight" then MoveE else NoOp) keyDecoder)
     , Browser.Events.onKeyDown
         (Decode.map (\key -> if key == "ArrowLeft" then MoveW else NoOp) keyDecoder)
-    , Time.every 1000 (\_ -> AIMove)
+    , Time.every 500 (\_ -> AIMove)
     , Time.every 1000 (\x -> Tick x)
     ]
 

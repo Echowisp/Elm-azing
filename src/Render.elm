@@ -31,10 +31,12 @@ render model =
         aiTitle = renderText "AI"
         playerMaze = vertical [playerTitle,
                                stack [player,
+                                      renderFin,
                                       renderMaze model.playerMaze,
                                       renderMazeBg]]
         aiMaze = vertical [aiTitle,
                            stack [ai,
+                                  renderFin,
                                   renderMaze model.aiMaze,
                                   renderMazeBg]]
         spacing = spacer 50 0
@@ -62,7 +64,6 @@ renderMazeBg : Collage msg
 renderMazeBg =
         Collage.square (cellSize * mazeSize) |> filled (uniform lightPurple)
 
-
 renderWalls : Node -> Collage msg
 renderWalls node =
     let
@@ -88,6 +89,21 @@ renderWalls node =
                     |> traced (solid thin (uniform blue))) :: sPath
     in
         stack wPath
+
+renderFin : Collage msg
+renderFin =
+    let
+        xcolor = red
+        l = segment (0, 0) (cellSize, -cellSize)
+            |> traced (solid thick (uniform xcolor))
+            |> scale 0.75
+        r = segment (0, -cellSize) (cellSize, 0)
+            |> traced (solid thick (uniform xcolor))
+            |> scale 0.75
+    in
+        stack [l, r]
+        |> shift (cellSize/7, -cellSize/7) --Top left of Node is now on the origin
+        |> shift (calculateShift 29 29)
 
 renderNode : Int -> Int -> Node -> Collage msg
 renderNode r c nd =
@@ -115,7 +131,7 @@ renderAI (r, c) =
         (x, y) = convertRCToXY r c
     in
     (Collage.circle <| cellSize/3)
-    |> filled (uniform red)
+    |> filled (uniform orange)
     |> shift (cellSize/2, -cellSize/2) --Top left of Node is now on the origin
     |> shift (calculateShift r c)
 
@@ -124,20 +140,30 @@ renderVictory =
     let
         msg = Text.fromString "You win!"
               |> Text.size huge
+              |> Text.weight Bold
               |> rendered
+        msg2 = Text.fromString "Select a difficulty and press go to play again"
+               |> Text.size large
+               |> rendered
         bg = Collage.rectangle 500 200 |> filled (uniform darkGreen)
     in
-        stack [msg, bg]
+        stack [vertical [msg, (spacer 0 20), msg2], bg]
+        |> shift (cellSize * mazeSize / 1.9, -cellSize * mazeSize / 2)
 
 renderDefeat : Collage msg
 renderDefeat =
     let
-        msg = Text.fromString "You win!"
+        msg = Text.fromString "You Lose :\'("
               |> Text.size huge
+              |> Text.weight Bold
               |> rendered
+        msg2 = Text.fromString "Select a difficulty and press go to play again"
+               |> Text.size large
+               |> rendered
         bg = Collage.rectangle 500 200 |> filled (uniform red)
     in
-        stack [msg, bg]
+        stack [vertical [msg, (spacer 0 20), msg2], bg]
+        |> shift (cellSize * mazeSize / 1.9, -cellSize * mazeSize / 2)
 
 convertRCToXY : Int -> Int -> (Float, Float)
 convertRCToXY r c = ((toFloat c) - mazeSize / 2.0, mazeSize / 2.0 - (toFloat r))
