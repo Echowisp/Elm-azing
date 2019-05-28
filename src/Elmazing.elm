@@ -11,6 +11,10 @@ import Grid exposing (..)
 import Render exposing (..)
 import MazeTypes exposing (..)
 import RandomDFS exposing (..)
+import RecursiveDivision exposing (..)
+import MazeAI exposing (..)
+import Time exposing (..)
+import Random exposing (..)
 import Bootstrap.Button as Button exposing (..)
 import Bootstrap.Grid as BGrid exposing (..)
 import Bootstrap.Grid.Col as Col exposing (..)
@@ -25,17 +29,19 @@ initModel =
         aiMaze = walledMaze mazeSize mazeSize,
         player = (0,0),
         ai = (0,0),
+        aiState = {dir = N, seed = seed0},
         difficulty = Easy,
         winner = None,
         gameState = Stopped,
-        winningCoord = (29, 29)
+        winningCoord = (29, 29),
+        seed = seed0
     }
 
 
 -- UPDATE
 
 type Msg = MoveN | MoveS | MoveE | MoveW | DiffEasy | DiffMed | DiffHard | Gen |
-           NoOp | AIMove
+           NoOp | AIMove | Tick Posix
 
 updatePlayerCoord : Model -> Direction -> Model
 updatePlayerCoord mdl dir =
@@ -43,7 +49,6 @@ updatePlayerCoord mdl dir =
     if mdl.gameState == Started then
         let
             newCoord = (Maze.movePlayer mdl.player dir mdl.playerMaze)
-            a = Debug.log "???" 1
         in
         {
             mdl |
@@ -67,15 +72,40 @@ updateDifficulty mdl newDiff =
 
 generateMazes : Model -> Model
 generateMazes mdl =
+    let
+        sd = mdl.seed
+        aiSd = mdl.aiState.seed
+    in
     if mdl.gameState == Started then
         mdl
     else
         {
-            initModel | playerMaze = RandomDFS.buildMaze mazeSize mazeSize,
-                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize,
+            initModel | playerMaze = RecursiveDivision.buildMaze mazeSize mazeSize sd,
+                        aiMaze = RecursiveDivision.buildMaze mazeSize mazeSize aiSd,
                         gameState = Started,
                         difficulty = mdl.difficulty
         }
+
+makeAIMove : Model -> Model
+makeAIMove mdl =
+    if mdl.gameState /= Started then
+        mdl
+    else
+        case mdl.difficulty of
+            Easy -> bruteForceAI mdl
+            Medium -> Debug.todo "???"
+            Hard -> Debug.todo "???"
+
+updateSeed : Model -> Int -> Model
+updateSeed mdl nseed =
+    let
+        ai = mdl.aiState
+    in
+    {
+        mdl |
+            seed = initialSeed nseed,
+            aiState = { ai | seed = initialSeed -nseed }
+    }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -88,8 +118,9 @@ update msg model =
         DiffMed -> (updateDifficulty model Medium, Cmd.none)
         DiffHard -> (updateDifficulty model Hard, Cmd.none)
         Gen -> (generateMazes model, Cmd.none)
-        AIMove -> Debug.todo "???"
-        NoOp -> (model, Cmd.none) --I don't know if this is useful
+        AIMove -> (makeAIMove model, Cmd.none)
+        Tick x -> (updateSeed model (posixToMillis x), Cmd.none)
+        NoOp -> (model, Cmd.none)
 
 -- VIEW
 
@@ -143,6 +174,8 @@ subscriptions model =
         (Decode.map (\key -> if key == "ArrowRight" then MoveE else NoOp) keyDecoder)
     , Browser.Events.onKeyDown
         (Decode.map (\key -> if key == "ArrowLeft" then MoveW else NoOp) keyDecoder)
+    , Time.every 1000 (\_ -> AIMove)
+    , Time.every 1000 (\x -> Tick x)
     ]
 
 -- MAIN

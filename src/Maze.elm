@@ -9,7 +9,7 @@ initialNode : Node
 initialNode =
     Node False False False False
 
-openNode : Node 
+openNode : Node
 openNode =
     Node True True True True
 
@@ -18,8 +18,8 @@ walledMaze x y =
     Grid.repeat x y initialNode
 
 
-openMaze : Int -> Int -> Maze 
-openMaze x y = 
+openMaze : Int -> Int -> Maze
+openMaze x y =
     Grid.repeat x y openNode
 
 
@@ -107,12 +107,12 @@ coordHasPath maze coord dir =
 
 
 selectMap : (Node -> Node) -> List Coordinate -> Maze -> Maze
-selectMap f select maze = 
-    case select of 
-        []          -> maze 
-        coord::rest -> 
-            let 
-                node =  Grid.get coord maze |> Maybe.withDefault openNode
+selectMap f select maze =
+    case select of
+        []          -> maze
+        coord::rest ->
+            let
+                node = Grid.get coord maze |> Maybe.withDefault openNode
             in
                 selectMap f rest (Grid.set coord (f node) maze)
 
@@ -171,12 +171,14 @@ randomNeighbor neighbors =
     Random.int 0 ((+) -1 <| List.length neighbors)
     |> Random.map (\k -> kth k neighbors)
 
-
+stepDirection : Random.Seed -> (Direction, Random.Seed)
+stepDirection seed =
+    Random.step (randomDirection) seed
 
 stepNeighbor : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed)
 stepNeighbor seed neighbors =
     Random.step (randomNeighbor neighbors) seed
 
 
-randomElement : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed) 
+randomElement : Random.Seed -> List Coordinate -> (Coordinate, Random.Seed)
 randomElement = stepNeighbor

@@ -1,6 +1,7 @@
 module MazeTypes exposing (..)
 
 import Array exposing (Array)
+import Random exposing (..)
 
 type alias Coordinate = (Int, Int)
 
@@ -19,10 +20,12 @@ type alias Model =
         aiMaze : Maze,
         player : Coordinate,
         ai : Coordinate,
+        aiState : AIState,
         difficulty : Difficulty,
         winner : Player,
         gameState : GameState,
-        winningCoord : Coordinate
+        winningCoord : Coordinate,
+        seed : Seed
     }
 
 type alias Node =
@@ -30,6 +33,12 @@ type alias Node =
     , e : Bool
     , w : Bool
     , s : Bool
+    }
+
+type alias AIState =
+    {
+        dir : Direction,
+        seed : Random.Seed
     }
 
 mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
