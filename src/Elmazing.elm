@@ -12,7 +12,7 @@ import Render exposing (..)
 import MazeTypes exposing (..)
 import RandomDFS exposing (..)
 import RecursiveDivision exposing (..)
-import MazeAI exposing (..)
+import BruteForceAI exposing (..)
 import Time exposing (..)
 import Random exposing (..)
 import Bootstrap.Button as Button exposing (..)
@@ -81,7 +81,7 @@ generateMazes mdl =
     else
         {
             initModel | playerMaze = RecursiveDivision.buildMaze mazeSize mazeSize sd,
-                        aiMaze = RecursiveDivision.buildMaze mazeSize mazeSize aiSd,
+                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize aiSd,
                         gameState = Started,
                         difficulty = mdl.difficulty
         }
