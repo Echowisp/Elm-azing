@@ -13,7 +13,9 @@ import MazeTypes exposing (..)
 import RandomDFS exposing (..)
 import RecursiveDivision exposing (..)
 import BruteForceAI exposing (..)
+import WallFollowAI exposing (..)
 import Time exposing (..)
+import Dict
 import Random exposing (..)
 import Bootstrap.Button as Button exposing (..)
 import Bootstrap.Grid as BGrid exposing (..)
@@ -29,7 +31,7 @@ initModel =
         aiMaze = walledMaze mazeSize mazeSize,
         player = (0,0),
         ai = (0,0),
-        aiState = {dir = N, seed = seed0},
+        aiState = {dir = N, seed = seed0, hist = [], junctions = Dict.empty},
         difficulty = Easy,
         winner = None,
         gameState = Stopped,
@@ -91,10 +93,21 @@ makeAIMove mdl =
     if mdl.gameState /= Started then
         mdl
     else
-        case mdl.difficulty of
-            Easy -> bruteForceAI mdl
-            Medium -> Debug.todo "???"
-            Hard -> Debug.todo "???"
+        let
+            nextMdl =
+                case mdl.difficulty of
+                    Easy -> bruteForceAI mdl
+                    Medium -> wallFollowAI mdl
+                    Hard -> Debug.todo "???"
+        in
+            {
+                nextMdl |
+                    gameState =
+                        if nextMdl.ai == mdl.winningCoord then
+                            AIVictory
+                        else
+                            Started
+            }
 
 updateSeed : Model -> Int -> Model
 updateSeed mdl nseed =
@@ -174,7 +187,7 @@ subscriptions model =
         (Decode.map (\key -> if key == "ArrowRight" then MoveE else NoOp) keyDecoder)
     , Browser.Events.onKeyDown
         (Decode.map (\key -> if key == "ArrowLeft" then MoveW else NoOp) keyDecoder)
-    , Time.every 500 (\_ -> AIMove)
+    , Time.every 100 (\_ -> AIMove)
     , Time.every 1000 (\x -> Tick x)
     ]
 
