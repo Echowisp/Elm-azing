@@ -5,6 +5,7 @@ import Random exposing (..)
 import Array exposing (Array)
 
 type alias Coordinate = (Int, Int)
+type alias DEdge = (Coordinate, Coordinate)
 type alias History = List Coordinate
 
 type Direction = N | E | W | S
@@ -16,7 +17,7 @@ type GameState = AIVictory | PlayerVictory | Started | Stopped
 type alias Grid a = Array (Array a)
 type alias Maze = Grid Node
 
-type alias JunctionMap = Dict (Coordinate, Coordinate) Int
+type alias JunctionMap = Dict DEdge Int
 
 
 type alias Model =
@@ -46,7 +47,7 @@ type alias AIState =
         seed : Random.Seed,
         hist : History,
         junctions : JunctionMap,
-        forward : Bool 
+        forward : Bool
     }
 
 mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize

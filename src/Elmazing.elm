@@ -85,7 +85,7 @@ generateMazes mdl =
     else
         {
             initModel | playerMaze = RecursiveDivision.buildMaze mazeSize mazeSize sd,
-                        aiMaze = RandomDFS.buildMaze mazeSize mazeSize aiSd,
+                        aiMaze = RecursiveDivision.buildMaze mazeSize mazeSize aiSd,
                         gameState = Started,
                         difficulty = mdl.difficulty
         }
@@ -100,7 +100,7 @@ makeAIMove mdl =
                 case mdl.difficulty of
                     Easy -> bruteForceAI mdl
                     Medium -> wallFollowAI mdl
-                    Hard -> Debug.todo "???"
+                    Hard -> tremaux mdl
         in
             {
                 nextMdl |
