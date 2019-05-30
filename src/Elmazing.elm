@@ -1,5 +1,6 @@
 module Elmazing exposing (main)
 
+import Dict
 import Browser
 import Browser.Events
 import Json.Decode as Decode
@@ -13,6 +14,7 @@ import MazeTypes exposing (..)
 import RandomDFS exposing (..)
 import RecursiveDivision exposing (..)
 import BruteForceAI exposing (..)
+import TremauxAI exposing (tremaux)
 import Time exposing (..)
 import Random exposing (..)
 import Bootstrap.Button as Button exposing (..)
@@ -29,7 +31,7 @@ initModel =
         aiMaze = walledMaze mazeSize mazeSize,
         player = (0,0),
         ai = (0,0),
-        aiState = {dir = N, seed = seed0},
+        aiState = {dir = N, seed = seed0, forward = False, hist = [], junctions = Dict.empty},
         difficulty = Easy,
         winner = None,
         gameState = Stopped,
@@ -92,7 +94,7 @@ makeAIMove mdl =
         mdl
     else
         case mdl.difficulty of
-            Easy -> bruteForceAI mdl
+            Easy -> tremaux mdl
             Medium -> Debug.todo "???"
             Hard -> Debug.todo "???"
 
@@ -174,7 +176,7 @@ subscriptions model =
         (Decode.map (\key -> if key == "ArrowRight" then MoveE else NoOp) keyDecoder)
     , Browser.Events.onKeyDown
         (Decode.map (\key -> if key == "ArrowLeft" then MoveW else NoOp) keyDecoder)
-    , Time.every 500 (\_ -> AIMove)
+    , Time.every 1 (\_ -> AIMove)
     , Time.every 1000 (\x -> Tick x)
     ]
 

@@ -106,26 +106,6 @@ verifyAdjacent (r1, c1) (r2, c2) =
 
 
 
--- Called with the assumption that the two coordinates
--- are adjacent
---
--- For coordinates a and b returns a tuple of the form of the directions
--- (a -> b, b -> a)
-relativePosition : Coordinate -> Coordinate -> (Direction, Direction)
-relativePosition (r1, c1) (r2, c2) =
-    if r1 - r2 /= 0 then
-        if r1 - r2 < 0 then
-            (S, N)
-        else
-            (N, S)
-    else
-        if c1 - c2 < 0 then
-            (E, W)
-        else
-            (W, E)
-
-
-
 
 
 

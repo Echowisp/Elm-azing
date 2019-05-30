@@ -16,7 +16,7 @@ type GameState = AIVictory | PlayerVictory | Started | Stopped
 type alias Grid a = Array (Array a)
 type alias Maze = Grid Node
 
-type alias JunctionMap = Dict Coordinate (List Direction)
+type alias JunctionMap = Dict (Coordinate, Coordinate) Int
 
 
 type alias Model =
@@ -45,7 +45,8 @@ type alias AIState =
         dir : Direction,
         seed : Random.Seed,
         hist : History,
-        junctions : JunctionMap 
+        junctions : JunctionMap,
+        forward : Bool 
     }
 
 mazeSize = 30 -- Maze dimensions will be mazeSize x mazeSize
@@ -60,3 +61,31 @@ oppositeDir dir =
         E -> W
         W -> E
         S -> N
+
+
+orthogonalDirs : Direction -> List Direction
+orthogonalDirs dir =
+    case dir of 
+        N -> [E, W]
+        E -> [N, S]
+        W -> [N, S]
+        S -> [S, N]
+
+
+-- Called with the assumption that the two coordinates
+-- are adjacent
+--
+-- For coordinates a and b returns a tuple of the form of the directions
+-- (a -> b, b -> a)
+relativePosition : Coordinate -> Coordinate -> (Direction, Direction)
+relativePosition (r1, c1) (r2, c2) =
+    if r1 - r2 /= 0 then
+        if r1 - r2 < 0 then
+            (S, N)
+        else
+            (N, S)
+    else
+        if c1 - c2 < 0 then
+            (E, W)
+        else
+            (W, E)

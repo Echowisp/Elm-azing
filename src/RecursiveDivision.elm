@@ -84,9 +84,8 @@ divide seed (r, c) w h maze =
         let
             (wallRow, seed1) = randInt seed (r + 1) (r + h - 1)
             (doorCol, seed2) = randInt seed1 c (c + w - 1)
-            newMaze =
-                addHorizontalWall (wallRow - 1) c (c + w) maze
-                       |> openHorizontalDoor (wallRow - 1, doorCol)
+            newMaze = addHorizontalWall (wallRow - 1) c (c + w) maze
+                        |> openHorizontalDoor (wallRow - 1, doorCol)
         in
           divide (Random.initialSeed wallRow) (wallRow, c) w (h - (wallRow - r))
                  (divide seed2 (r, c) w (wallRow - r) newMaze)

@@ -143,6 +143,16 @@ isDeadEnd maze coord dir =
                     if cnt == 1 then True else False
             Nothing -> Debug.todo "Error in isJunction" -- Shouldn't Get Here
 
+
+isIntersection : Coordinate -> Maze -> Bool
+isIntersection coord maze = 
+    case getValidDirs coord maze of 
+        []        -> False
+        dir::dirs -> 
+            let orthogonals = orthogonalDirs dir in
+                List.any (\d -> List.member d dirs) orthogonals
+
+
 {-- ========= End Coordinate Functions ================= --}
 
 getNeighbors_ : Coordinate -> List Coordinate
@@ -168,6 +178,10 @@ getValidMoves coord maze =
     List.filter (\dir -> coordHasPath maze coord dir))
         cardinals
 
+
+getValidDirs : Coordinate -> Maze -> List Direction
+getValidDirs coord maze = 
+    (List.filter (\dir -> coordHasPath maze coord dir)) cardinals
 
 kth : Int -> List Coordinate -> Coordinate
 kth k coords =
