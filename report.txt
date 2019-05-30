@@ -1,0 +1,65 @@
+== Elm-Mazing ==
+
+== Authors ==
+
+Kevin He (kyhe), Isaac Adeleke (isaacadlk)
+
+== Overview ==
+
+Elm-mazing is a game in which the player competes with an AI to complete a maze.
+This document will highlight some key design decisions and accomplishments that
+occurred throughout the course of the project.
+
+== Maze Representation ==
+
+Our maze is represented internally as a 2 dimensional array of Nodes, where each
+node has 4 variables indicating whether the node has a path going in a given
+cardinal direction. We chose this representation because it meshed well with the
+maze generation algorithm that we chose.
+
+Isaac re-implemented a part of the Grid library (which has not been updated for
+Elm 0.19) and we wrote a reasonably complex API for interacting with Mazes and
+Grids.
+
+== Maze Generation ==
+
+Maze generation was done using the Recursive Division algorithm. In this
+algorithm, the maze starts as an empty maze. A random bisector is then generated
+and one gap is opened up along this bisector. The two new halves of the maze
+then serve as inputs to this recursive algorithm. We also implemented Recursive
+DFS as a maze generation algorithm, but found that it generated mazes that were
+too easy for a human to solve. The code for this latter approach is still here
+in case you're curious.
+
+== Rendering ==
+
+The maze is rendered using the Elm-collage library and most of the styling is
+done using Elm-bootstrap. Initially, we found that our first implementation of
+the rendering functions took too long to render the maze, and the user would
+encounter noticeable lag. We made efforts to speed up the running time of the
+rendering algorithm and it is now reasonably quick.
+
+== Maze AI ==
+
+We implemented 3 different AI's for the user to play against. These AI's use
+different algorithms and correspond with the 3 difficulty levels that the user
+can select.
+
+The Easy AI is a simple brute-force algorithm. It will continue moving in a
+given direction untill it hits an intersection, where it will randomly select a
+direction to turn. This AI will never move backwards unless if hits a dead end.
+(eg. If the AI moving N encounters a 4 way junction, it will not choose to move
+south) We have never seen this AI successfully reach the goal.
+
+The Medium AI uses the "follow the wall to your right" algorithm. Its
+performance is pretty reasonable and can reliably reach the end in a reasonable
+time, but it can also get pretty unlucky depending on the maze.
+
+The Hard AI uses Tremeaux's Algorithm.
+
+== Reflections on Elm ==
+
+Overall, Elm has been a pretty enjoyable language to work in, and a welcom
+change from the large amounts of imperative programming that we usually do. In
+particular, it's union type system offers a particular elegant way to represent
+things with different options, and feels pretty good to use.
