@@ -55,11 +55,24 @@ The Medium AI uses the "follow the wall to your right" algorithm. Its
 performance is pretty reasonable and can reliably reach the end in a reasonable
 time, but it can also get pretty unlucky depending on the maze.
 
-The Hard AI uses Tremeaux's Algorithm.
+The Hard AI uses Tremeaux's Algorithm. Tremaux's algorithm is like a grandfather
+approach to a depth first search. In the algorithm the AI continues moving in
+the direction it was proceeding in until it reaches an intersection. At the
+interserction it marks the path that it took to the intersection. Based on the
+number of markings  at each path on the intersection point the algorithm with
+choose a different path  to enter, marking/remarking paths as necessary. Paths
+with two marks are treated as dead ends and never entered again. 
 
 == Reflections on Elm ==
 
-Overall, Elm has been a pretty enjoyable language to work in, and a welcom
+Overall, Elm has been a pretty enjoyable language to work in, and a welcome
 change from the large amounts of imperative programming that we usually do. In
 particular, it's union type system offers a particular elegant way to represent
 things with different options, and feels pretty good to use.
+
+In particular, one enjoyable aspect of Elm was the functionality of the Maybe
+type that allows for elegant checking of errors and conditions. Their use
+noticeably  reduced the errors that can be attributed to things like null
+pointer exceptions. In fact, most of the errors/bugs that came from programming
+in elm came from  misunderstandings of algorithms and sneaky, subtle mistakes
+which was a nice change of pace.
